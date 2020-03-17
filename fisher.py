@@ -9,12 +9,12 @@
 from flask import Flask
 # from config import DEBUG,PORT
 from app.web import book
+from app import create_app
+
+fishWeb = create_app()
 
 
-fishWeb = Flask(__name__)
-#fishWeb实例导入配置文件，接收模块的路径
-fishWeb.config.from_object('config')
-
+'''
 @fishWeb.route('/')
 def index():
     return "this is my page"
@@ -30,6 +30,8 @@ def hello():
         'location':'http://www.bing.com'
     }
     return '<html></html>',301,headers
+
+'''
 
 #使用基于类的试图（即插视图），用add_url_rule 类似于django
 # fishWeb.add_url_rule('/hello', view_func=hello)
