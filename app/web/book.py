@@ -12,7 +12,7 @@ from helper import is_isbn_or_key
 from yushu_book import YuShuBook
 
 from . import web
-
+from app.forms.book import SearchForm
 
 
 #蓝图中的视图函数的名字不能和蓝图对象的名字一样！！！即下面的函数名不能为web
@@ -31,15 +31,25 @@ def search():
     """
 
     #通过request来获取查询参数(？q=金庸&page=1)
-    q = request.args["q"]
-    #至少要有一个字符，长度也应该有限制
-    page = request.args["page"]
 
-    isbn_or_key = is_isbn_or_key(q)
-    if isbn_or_key == 'isbn':
-        result = YuShuBook.search_by_isbn(q)
+    # q至少要有一个字符，长度也应该有限制
+    # q = request.args["q"]
+    #页数必须为正整数，也要有一个最大值限制
+    # page = request.args["page"]
+
+    # 验证层
+    form = SearchForm(request.args)
+    #调用form的validate来验证
+    if form.validate():     #验证为true时
+        q = form.q.data.strip()
+        page = form.page.data
+        isbn_or_key = is_isbn_or_key(q)
+        if isbn_or_key == 'isbn':
+            result = YuShuBook.search_by_isbn(q)
+        else:
+            result = YuShuBook.search_by_keyword(q)
+        #dict序列化
+        return jsonify(result)  #等同于下行代码
+        # return json.dumps(result),200,{'content-type':'application/json'}
     else:
-        result = YuShuBook.search_by_keyword(q)
-    #dict序列化
-    return jsonify(result)  #等同于下行代码
-    # return json.dumps(result),200,{'content-type':'application/json'}
+        return jsonify({"msg":"参数校验失败"})
